@@ -117,6 +117,16 @@
 
       </form>
 
+      <div class="login-demo">
+        <button
+          type="button"
+          class="login-demo-button"
+          @click="useDemoAccount"
+        >
+          Use test account
+        </button>
+      </div>
+
       <div class="login-register">
         <span>Don't have an account?</span>
 
@@ -154,6 +164,11 @@ const email = ref("");
 const password = ref("");
 
 const showPassword = ref(false);
+
+const useDemoAccount = () => {
+  email.value = "testuser@example.com";
+  password.value = "Test@12345";
+};
 
 
 /* =========================================================

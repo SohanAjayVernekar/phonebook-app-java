@@ -1,10 +1,37 @@
 <template>
-  <article class="contact-card-modern">
+  <article
+    class="contact-card-modern"
+    :class="[
+      mode === 'list' ? 'list-mode' : 'grid-mode',
+      {
+        'is-selected': selected,
+        'is-focused': focused,
+      },
+    ]"
+    tabindex="0"
+    @focus="emit('item-focus')"
+    @keydown="onKeydown"
+  >
 
     <!-- Card header -->
     <div class="contact-card-top">
 
       <div class="profile-area">
+
+        <!-- Selection checkbox (bulk actions) -->
+        <label
+          v-if="selectable"
+          class="card-checkbox"
+          title="Select contact"
+          @click.stop
+        >
+          <input
+            type="checkbox"
+            :checked="selected"
+            aria-label="Select contact"
+            @change="emit('toggle-select')"
+          />
+        </label>
 
         <!-- Avatar -->
         <div class="large-avatar">
@@ -14,24 +41,15 @@
         <!-- Profile -->
         <div class="profile-details">
 
-          <!-- Category -->
-          <span
-            class="contact-category"
-            :class="categoryClass"
-          >
-            {{ categoryLabel }}
+          <!-- Name (same label as the table column) -->
+          <span class="field-label">
+            Name
           </span>
 
           <!-- Name -->
           <h2>
             {{ contact.name }}
           </h2>
-
-          <!-- Status -->
-          <div class="contact-status">
-            <span class="status-dot"></span>
-            <span>Active contact</span>
-          </div>
 
         </div>
 
@@ -52,89 +70,99 @@
     </div>
 
 
-    <!-- Contact information -->
-    <div class="contact-info">
+    <!-- Contact information
+         Same clear labels as the table columns:
+         Name · Phone Number · Email Address · Category · Address -->
+    <div class="contact-fields">
 
-      <!-- Phone -->
-      <div class="contact-info-row">
+      <!-- Phone Number -->
+      <div class="contact-field">
 
-        <div class="detail-icon phone-detail">
-          ☎
-        </div>
+        <span class="field-label">
+          Phone Number
+        </span>
 
-        <div class="detail-content">
-
-          <span class="info-label">
-            PHONE
-          </span>
-
-          <strong class="info-value">
-            <a
-              :href="phoneLink"
-              class="contact-link"
-            >
-              {{ contact.phone_number }}
-            </a>
-          </strong>
-
-        </div>
+        <strong class="field-value phone-value">
+          <a
+            :href="phoneLink"
+            class="contact-link"
+            :title="contact.phone_number"
+          >
+            {{ contact.phone_number }}
+          </a>
+        </strong>
 
       </div>
 
 
-      <!-- Email -->
-      <div
-        v-if="contact.email"
-        class="contact-info-row"
-      >
+      <!-- Email Address -->
+      <div class="contact-field">
 
-        <div class="detail-icon email-detail">
-          ✉
-        </div>
+        <span class="field-label">
+          Email Address
+        </span>
 
-        <div class="detail-content">
+        <strong
+          v-if="contact.email"
+          class="field-value"
+        >
+          <a
+            :href="emailLink"
+            class="contact-link"
+            :title="contact.email"
+          >
+            {{ contact.email }}
+          </a>
+        </strong>
 
-          <span class="info-label">
-            EMAIL
-          </span>
+        <strong
+          v-else
+          class="field-value field-empty"
+        >
+          —
+        </strong>
 
-          <strong class="info-value">
-            <a
-              :href="emailLink"
-              class="contact-link"
-            >
-              {{ contact.email }}
-            </a>
-          </strong>
+      </div>
 
-        </div>
+
+      <!-- Category -->
+      <div class="contact-field">
+
+        <span class="field-label">
+          Category
+        </span>
+
+        <span
+          class="contact-category"
+          :class="categoryClass"
+        >
+          {{ categoryLabel }}
+        </span>
 
       </div>
 
 
       <!-- Address -->
-      <div
-        v-if="contact.address"
-        class="contact-info-row"
-      >
+      <div class="contact-field">
 
-        <div class="detail-icon address-detail">
-          ⌂
-        </div>
+        <span class="field-label">
+          Address
+        </span>
 
-        <div class="detail-content">
+        <strong
+          v-if="contact.address"
+          class="field-value address-value"
+          :title="contact.address"
+        >
+          {{ contact.address }}
+        </strong>
 
-          <span class="info-label">
-            ADDRESS
-          </span>
-
-          <strong
-            class="info-value address-value"
-          >
-            {{ contact.address }}
-          </strong>
-
-        </div>
+        <strong
+          v-else
+          class="field-value field-empty"
+        >
+          —
+        </strong>
 
       </div>
 
@@ -201,6 +229,29 @@ const props = defineProps({
     type: Object,
     required: true,
   },
+
+  /*
+   * "grid" = card layout, "list" = compact row layout.
+   */
+  mode: {
+    type: String,
+    default: "grid",
+  },
+
+  selectable: {
+    type: Boolean,
+    default: false,
+  },
+
+  selected: {
+    type: Boolean,
+    default: false,
+  },
+
+  focused: {
+    type: Boolean,
+    default: false,
+  },
 });
 
 
@@ -210,6 +261,9 @@ const props = defineProps({
 
 const emit = defineEmits([
   "contact-deleted",
+  "toggle-select",
+  "item-focus",
+  "open",
 ]);
 
 
@@ -324,6 +378,38 @@ const emailLink = computed(() => {
 
   return `mailto:${props.contact.email}`;
 });
+
+
+/* =========================================================
+   Keyboard (Enter opens, Space selects)
+========================================================= */
+
+const onKeydown = (event) => {
+
+  /*
+   * Ignore keys pressed inside buttons,
+   * links, and the checkbox.
+   */
+  if (event.target !== event.currentTarget) {
+    return;
+  }
+
+
+  if (event.key === "Enter") {
+    event.preventDefault();
+    emit("open");
+    return;
+  }
+
+
+  if (event.key === " ") {
+    event.preventDefault();
+
+    if (props.selectable) {
+      emit("toggle-select");
+    }
+  }
+};
 
 
 /* =========================================================

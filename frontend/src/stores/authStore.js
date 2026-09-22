@@ -55,6 +55,8 @@ export const useAuthStore = defineStore("auth", {
         ) {
           this.error =
             error.response.data.detail ||
+            error.response.data.message ||
+            error.response.data.error ||
             "Login failed";
         } else {
           this.error =
@@ -118,6 +120,8 @@ export const useAuthStore = defineStore("auth", {
         ) {
           this.error =
             error.response.data.detail ||
+            error.response.data.message ||
+            error.response.data.error ||
             "Registration failed";
         } else {
           this.error =
@@ -128,6 +132,82 @@ export const useAuthStore = defineStore("auth", {
 
       } finally {
         this.loading = false;
+      }
+    },
+
+
+    /* =====================================================
+       PROFILE — fetch current user from the server
+    ===================================================== */
+
+    async fetchProfile() {
+      try {
+        const response = await api.get("/auth/me");
+
+        this.user = response.data;
+
+        localStorage.setItem(
+          "auth_user",
+          JSON.stringify(response.data)
+        );
+
+        return response.data;
+
+      } catch (error) {
+        /*
+         * Keep the cached user if the
+         * server is unreachable.
+         */
+        return null;
+      }
+    },
+
+
+    /* =====================================================
+       PROFILE — update the display name
+    ===================================================== */
+
+    async updateProfile(name) {
+      try {
+        const response = await api.patch(
+          "/auth/me",
+          { name }
+        );
+
+        this.user = response.data;
+
+        localStorage.setItem(
+          "auth_user",
+          JSON.stringify(response.data)
+        );
+
+        return response.data;
+
+      } catch (error) {
+        throw error;
+      }
+    },
+
+
+    /* =====================================================
+       SECURITY — change password
+    ===================================================== */
+
+    async changePassword(
+      currentPassword,
+      newPassword
+    ) {
+      try {
+        await api.patch(
+          "/auth/me/password",
+          {
+            current_password: currentPassword,
+            new_password: newPassword,
+          }
+        );
+
+      } catch (error) {
+        throw error;
       }
     },
 

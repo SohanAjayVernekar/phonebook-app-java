@@ -3,12 +3,13 @@ import axios from "axios";
 
 const api = axios.create({
   /*
-   * Nginx proxies /api/* to FastAPI.
+   * Nginx proxies /api/* to the Spring Boot backend.
    *
-   * Using a relative URL means:
+   * Using a relative URL means the browser always uses
+   * the same origin (http://localhost served by Nginx),
+   * so no CORS configuration is needed:
    * - localhost works
-   * - ngrok works
-   * - no hard-coded backend URL
+   * - no hard-coded backend URL / port
    */
   baseURL: "/api",
 

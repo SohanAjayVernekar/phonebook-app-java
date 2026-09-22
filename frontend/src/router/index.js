@@ -22,6 +22,9 @@ import Login from
 import Register from
   "../views/Register.vue";
 
+import Profile from
+  "../views/Profile.vue";
+
 
 const router = createRouter({
 
@@ -63,6 +66,21 @@ const router = createRouter({
 
       meta: {
         guestOnly: true,
+      },
+    },
+
+
+    // =====================================================
+    // Profile & settings
+    // =====================================================
+
+    {
+      path: "/profile",
+      name: "profile",
+      component: Profile,
+
+      meta: {
+        requiresAuth: true,
       },
     },
 

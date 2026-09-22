@@ -123,6 +123,27 @@
 
           </router-link>
 
+
+          <!-- Profile & Settings -->
+          <router-link
+            to="/profile"
+            class="nav-item"
+            active-class="active"
+            @click="
+              sidebarOpen = false
+            "
+          >
+
+            <span class="nav-item-icon">
+              ⚙
+            </span>
+
+            <span>
+              Profile &amp; Settings
+            </span>
+
+          </router-link>
+
         </nav>
 
       </div>
@@ -134,8 +155,15 @@
 
       <div class="sidebar-bottom">
 
-        <!-- User -->
-        <div class="sidebar-user">
+        <!-- User → opens the profile page -->
+        <router-link
+          to="/profile"
+          class="sidebar-user sidebar-user-link"
+          title="Open profile &amp; settings"
+          @click="
+            sidebarOpen = false
+          "
+        >
 
           <div class="user-avatar">
             {{ userInitials }}
@@ -153,7 +181,14 @@
 
           </div>
 
-        </div>
+          <span
+            class="sidebar-user-arrow"
+            aria-hidden="true"
+          >
+            →
+          </span>
+
+        </router-link>
 
 
         <!-- System Status -->
@@ -410,6 +445,13 @@ const sidebarOpen = ref(false);
 ========================================================= */
 
 const currentPageTitle = computed(() => {
+
+  if (
+    route.name === "profile"
+  ) {
+    return "Profile & Settings";
+  }
+
 
   if (
     route.name === "contact-create"
