@@ -3,7 +3,7 @@ import axios from "axios";
 
 const api = axios.create({
   /*
-   * Nginx proxies /api/* to the Spring Boot backend.
+   * Nginx proxies /api/* to the .NET backend.
    *
    * Using a relative URL means the browser always uses
    * the same origin (http://localhost served by Nginx),

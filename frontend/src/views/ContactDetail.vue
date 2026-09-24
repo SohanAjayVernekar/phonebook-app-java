@@ -27,8 +27,102 @@
         class="back-button"
         @click="goBack"
       >
-        <span>←</span>
+        <span class="back-arrow">
+          <svg
+            width="15"
+            height="15"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="1.8"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            aria-hidden="true"
+          >
+            <path :d="ICONS.chevronLeft" />
+          </svg>
+        </span>
         <span>Back to Contacts</span>
+      </button>
+
+    </div>
+
+
+    <!-- =====================================================
+         PROFILE HERO
+    ====================================================== -->
+
+    <div class="detail-grid">
+
+    <div
+      v-if="!loading && !loadError"
+      class="profile-hero-card"
+    >
+
+      <span
+        class="profile-hero-avatar"
+        aria-hidden="true"
+      >
+        {{ detailInitials }}
+      </span>
+
+
+      <div class="profile-hero-id">
+        <span class="section-label">
+          CONTACT PROFILE
+        </span>
+
+        <h2>
+          {{ form.name || "Untitled contact" }}
+        </h2>
+
+        <p class="profile-hero-meta">
+          <span
+            class="contact-category"
+            :class="detailChipClass"
+          >
+            {{ form.category || "FRIEND" }}
+          </span>
+
+          <span v-if="sinceLabel">
+            Contact since {{ sinceLabel }}
+          </span>
+        </p>
+      </div>
+
+
+      <button
+        type="button"
+        class="profile-fav"
+        :class="{ 'is-favorite': detailFav }"
+        :aria-pressed="detailFav"
+        :aria-label="
+          detailFav
+            ? 'Remove from favorites'
+            : 'Add to favorites'
+        "
+        @click="onToggleDetailFav"
+      >
+        <svg
+          width="17"
+          height="17"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="1.8"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          aria-hidden="true"
+        >
+          <path
+            :d="ICONS.favorites"
+            :fill="detailFav ? 'currentColor' : 'none'"
+          />
+        </svg>
+
+        <span>
+          {{ detailFav ? "Favorited" : "Favorite" }}
+        </span>
       </button>
 
     </div>
@@ -94,7 +188,19 @@
       <div class="form-title">
 
         <div class="edit-icon">
-          ✎
+          <svg
+            width="17"
+            height="17"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="1.8"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            aria-hidden="true"
+          >
+            <path :d="ICONS.edit" />
+          </svg>
         </div>
 
         <div>
@@ -233,23 +339,12 @@
           <span>*</span>
         </label>
 
-        <select
-          id="category"
+        <UiDropdown
+          input-id="category"
           v-model="form.category"
-          required
-        >
-          <option value="WORK">
-            Work
-          </option>
-
-          <option value="FAMILY">
-            Family
-          </option>
-
-          <option value="FRIEND">
-            Friend
-          </option>
-        </select>
+          :options="CATEGORY_OPTIONS"
+          label="Category"
+        />
 
       </div>
 
@@ -273,11 +368,32 @@
         <button
           type="submit"
           class="save-button"
-          :disabled="saving"
+          :class="{ 'is-saved': saved }"
+          :disabled="saving || saved"
         >
 
           <span v-if="saving">
             Saving...
+          </span>
+
+          <span
+            v-else-if="saved"
+            class="save-saved"
+          >
+            <svg
+              width="14"
+              height="14"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2.4"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              aria-hidden="true"
+            >
+              <path d="M20 6 9 17l-5-5" />
+            </svg>
+            Saved
           </span>
 
           <span v-else>
@@ -290,12 +406,15 @@
 
     </form>
 
+    </div>
+
   </section>
 </template>
 
 
 <script setup>
 import {
+  computed,
   reactive,
   ref,
   onMounted,
@@ -307,6 +426,20 @@ import {
 } from "vue-router";
 
 import api from "../services/api";
+
+import UiDropdown from "../components/UiDropdown.vue";
+
+import {
+  toast,
+} from "../services/ui";
+
+import {
+  useFavorites,
+} from "../composables/useFavorites";
+
+import {
+  ICONS,
+} from "../icons";
 
 
 /* =========================================================
@@ -333,6 +466,8 @@ const loading = ref(true);
 
 const saving = ref(false);
 
+const saved = ref(false);
+
 const loadError = ref("");
 
 const updateError = ref("");
@@ -344,6 +479,12 @@ const successMessage = ref("");
    Form
 ========================================================= */
 
+const CATEGORY_OPTIONS = [
+  { value: "WORK", label: "Work" },
+  { value: "FAMILY", label: "Family" },
+  { value: "FRIEND", label: "Friend" },
+];
+
 const form = reactive({
   name: "",
   phone_number: "",
@@ -351,6 +492,8 @@ const form = reactive({
   address: "",
   category: "FRIEND",
 });
+
+const createdAt = ref("");
 
 
 /* =========================================================
@@ -409,6 +552,10 @@ const loadContact = async () => {
     form.category =
       contact.category ||
       "FRIEND";
+
+
+    createdAt.value =
+      contact.created_at || "";
 
   } catch (error) {
 
@@ -552,6 +699,8 @@ const updateContact = async () => {
 
   successMessage.value = "";
 
+  saved.value = false;
+
 
   if (!validateForm()) {
     return;
@@ -590,6 +739,8 @@ const updateContact = async () => {
 
     successMessage.value =
       "Contact updated successfully.";
+
+    saved.value = true;
 
 
     /*
@@ -669,6 +820,86 @@ const updateContact = async () => {
 /* =========================================================
    Back
 ========================================================= */
+
+/* =========================================================
+   Profile hero (presentational — reads the same form)
+======================================================== */
+
+const {
+  isFavorite,
+  toggleFavorite,
+} = useFavorites();
+
+
+const detailFav = computed(() =>
+  isFavorite(contactId),
+);
+
+
+const onToggleDetailFav = () => {
+  const nowFavorite = toggleFavorite(contactId);
+
+  toast(
+    "success",
+    nowFavorite
+      ? "Added to favorites"
+      : "Removed from favorites",
+    form.name || "Contact",
+  );
+};
+
+
+const detailInitials = computed(() => {
+  const parts = String(form.name || "")
+    .trim()
+    .split(/\s+/)
+    .filter(Boolean);
+
+  if (parts.length === 0) {
+    return "?";
+  }
+
+  if (parts.length === 1) {
+    return parts[0].slice(0, 2).toUpperCase();
+  }
+
+  return (
+    parts[0][0] + parts[parts.length - 1][0]
+  ).toUpperCase();
+});
+
+
+const detailChipClass = computed(() => {
+  if (form.category === "WORK") {
+    return "category-work";
+  }
+
+  if (form.category === "FAMILY") {
+    return "category-family";
+  }
+
+  return "category-friend";
+});
+
+
+const sinceLabel = computed(() => {
+  const date = new Date(createdAt.value);
+
+  if (Number.isNaN(date.getTime())) {
+    return "";
+  }
+
+  try {
+    return new Intl.DateTimeFormat("en-US", {
+      month: "short",
+      day: "numeric",
+      year: "numeric",
+    }).format(date);
+  } catch {
+    return date.toLocaleDateString();
+  }
+});
+
 
 const goBack = () => {
 

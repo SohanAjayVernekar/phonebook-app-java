@@ -1,44 +1,38 @@
 services:
-  postgres:
-    image: postgres:16
-    container_name: phonebook-postgres
-    restart: unless-stopped
+  postgres-java:
+    image: postgres:16-alpine
+    container_name: phonebook-java-postgres
     environment:
       POSTGRES_DB: phonebook
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: postgres
     ports:
-      - "5432:5432"
+      - "5434:5432"
     volumes:
-      - postgres_data:/var/lib/postgresql/data
-    healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U postgres"]
-      interval: 10s
-      timeout: 5s
-      retries: 5
-
-  backend:
-    build: ./backend
-    container_name: phonebook-backend
+      - postgres_java_data:/var/lib/postgresql/data
     restart: unless-stopped
+
+  java-backend:
+    build: ./backend-java
+    container_name: phonebook-java-backend
     environment:
-      DATABASE_URL: jdbc:postgresql://postgres:5432/phonebook
-      DATABASE_USERNAME: postgres
-      DATABASE_PASSWORD: postgres
-    ports:
-      - "8000:8000"
+      DB_URL: jdbc:postgresql://postgres-java:5432/phonebook
+      DB_USERNAME: postgres
+      DB_PASSWORD: postgres
+      JWT_SECRET: change-this-secret-key-in-production-please-use-a-long-random-value
+      JWT_EXPIRATION_MINUTES: 60
     depends_on:
-      postgres:
-        condition: service_healthy
+      - postgres-java
+    restart: unless-stopped
 
   frontend:
     build: ./frontend
-    container_name: phonebook-frontend
-    restart: unless-stopped
+    container_name: phonebook-java-frontend
     ports:
-      - "80:80"
+      - "8082:80"
     depends_on:
-      - backend
+      - java-backend
+    restart: unless-stopped
 
 volumes:
-  postgres_data:
+  postgres_java_data:

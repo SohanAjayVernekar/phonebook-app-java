@@ -14,4 +14,10 @@ __pycache__/
 *.log
 
 .vscode/
-.idea/target/
+.idea/
+# .NET build output
+backend-dotnet/bin/
+backend-dotnet/obj/
+
+# Java build output
+backend-java/target/

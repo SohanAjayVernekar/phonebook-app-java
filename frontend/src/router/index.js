@@ -25,6 +25,27 @@ import Register from
 import Profile from
   "../views/Profile.vue";
 
+import Settings from
+  "../views/Settings.vue";
+
+import Dashboard from
+  "../views/Dashboard.vue";
+
+import Favorites from
+  "../views/Favorites.vue";
+
+import Categories from
+  "../views/Categories.vue";
+
+import ImportContacts from
+  "../views/Import.vue";
+
+import ExportContacts from
+  "../views/Export.vue";
+
+import NotFound from
+  "../views/NotFound.vue";
+
 
 const router = createRouter({
 
@@ -37,6 +58,10 @@ const router = createRouter({
       path: "/",
       name: "home",
       component: Home,
+
+      meta: {
+        title: "Home",
+      },
     },
 
 
@@ -51,6 +76,7 @@ const router = createRouter({
 
       meta: {
         guestOnly: true,
+        title: "Sign in",
       },
     },
 
@@ -66,21 +92,23 @@ const router = createRouter({
 
       meta: {
         guestOnly: true,
+        title: "Create account",
       },
     },
 
 
     // =====================================================
-    // Profile & settings
+    // Dashboard
     // =====================================================
 
     {
-      path: "/profile",
-      name: "profile",
-      component: Profile,
+      path: "/dashboard",
+      name: "dashboard",
+      component: Dashboard,
 
       meta: {
         requiresAuth: true,
+        title: "Dashboard",
       },
     },
 
@@ -96,6 +124,7 @@ const router = createRouter({
 
       meta: {
         requiresAuth: true,
+        title: "All Contacts",
       },
     },
 
@@ -111,6 +140,7 @@ const router = createRouter({
 
       meta: {
         requiresAuth: true,
+        title: "Add Contact",
       },
     },
 
@@ -126,6 +156,7 @@ const router = createRouter({
 
       meta: {
         requiresAuth: true,
+        title: "Contact Details",
       },
 
       props: (route) => ({
@@ -133,6 +164,114 @@ const router = createRouter({
           route.params.contactId
         ),
       }),
+    },
+
+
+    // =====================================================
+    // Favorites
+    // =====================================================
+
+    {
+      path: "/favorites",
+      name: "favorites",
+      component: Favorites,
+
+      meta: {
+        requiresAuth: true,
+        title: "Favorites",
+      },
+    },
+
+
+    // =====================================================
+    // Categories
+    // =====================================================
+
+    {
+      path: "/categories",
+      name: "categories",
+      component: Categories,
+
+      meta: {
+        requiresAuth: true,
+        title: "Categories",
+      },
+    },
+
+
+    // =====================================================
+    // Import / Export
+    // =====================================================
+
+    {
+      path: "/import",
+      name: "import",
+      component: ImportContacts,
+
+      meta: {
+        requiresAuth: true,
+        title: "Import Contacts",
+      },
+    },
+
+
+    {
+      path: "/export",
+      name: "export",
+      component: ExportContacts,
+
+      meta: {
+        requiresAuth: true,
+        title: "Export Contacts",
+      },
+    },
+
+
+    // =====================================================
+    // Profile
+    // =====================================================
+
+    {
+      path: "/profile",
+      name: "profile",
+      component: Profile,
+
+      meta: {
+        requiresAuth: true,
+        title: "Profile",
+      },
+    },
+
+
+    // =====================================================
+    // Settings
+    // =====================================================
+
+    {
+      path: "/settings",
+      name: "settings",
+      component: Settings,
+
+      meta: {
+        requiresAuth: true,
+        title: "Settings",
+      },
+    },
+
+
+    // =====================================================
+    // Not found (catch-all)
+    // =====================================================
+
+    {
+      path: "/:pathMatch(.*)*",
+      name: "not-found",
+      component: NotFound,
+
+      meta: {
+        requiresAuth: true,
+        title: "Page Not Found",
+      },
     },
 
   ],

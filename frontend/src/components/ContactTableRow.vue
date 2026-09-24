@@ -100,14 +100,14 @@
 
 
     <!-- Address -->
-    <td class="col-address">
+    <td class="col-added">
 
       <span
-        v-if="contact.address"
-        class="cell-text table-address"
-        :title="contact.address"
+        v-if="addedLabel"
+        class="cell-text table-added"
+        :title="addedTitle"
       >
-        {{ contact.address }}
+        {{ addedLabel }}
       </span>
 
       <span
@@ -116,6 +116,45 @@
       >
         —
       </span>
+
+    </td>
+
+
+    <!-- Favorite -->
+    <td class="col-fav">
+
+      <button
+        type="button"
+        class="row-action star-action"
+        :class="{ 'is-favorite': isFav }"
+        :aria-pressed="isFav"
+        :aria-label="
+          isFav
+            ? `Remove ${contact.name} from favorites`
+            : `Add ${contact.name} to favorites`
+        "
+        :title="
+          isFav
+            ? 'Remove from favorites'
+            : 'Add to favorites'
+        "
+        @click="onToggleFavorite"
+      >
+        <svg
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="1.8"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          aria-hidden="true"
+        >
+          <path
+            :d="ICONS.favorites"
+            :fill="isFav ? 'currentColor' : 'none'"
+          />
+        </svg>
+      </button>
 
     </td>
 
@@ -158,6 +197,19 @@ import {
 
 import api from "../services/api";
 
+import {
+  confirmAction,
+  toast,
+} from "../services/ui";
+
+import {
+  useFavorites,
+} from "../composables/useFavorites";
+
+import {
+  ICONS,
+} from "../icons";
+
 
 /* =========================================================
    Props
@@ -198,6 +250,37 @@ const emit = defineEmits([
 ========================================================= */
 
 const deleting = ref(false);
+
+
+/* =========================================================
+   Favorites (shared, persisted pb.favorites)
+========================================================= */
+
+const {
+  isFavorite,
+  toggleFavorite,
+} = useFavorites();
+
+
+const isFav = computed(() => {
+  return isFavorite(props.contact?.id);
+});
+
+
+const onToggleFavorite = () => {
+
+  const nowFavorite = toggleFavorite(
+    props.contact.id,
+  );
+
+  toast(
+    "success",
+    nowFavorite
+      ? "Added to favorites"
+      : "Removed from favorites",
+    props.contact.name,
+  );
+};
 
 
 /* =========================================================
@@ -277,6 +360,43 @@ const categoryClass = computed(() => {
    Phone
 ========================================================= */
 
+/* Added date (created_at from the API). */
+const addedLabel = computed(() => {
+
+  const date = new Date(
+    props.contact?.created_at || "",
+  );
+
+  if (Number.isNaN(date.getTime())) {
+    return "";
+  }
+
+  try {
+    return new Intl.DateTimeFormat("en-US", {
+      month: "short",
+      day: "numeric",
+      year: "numeric",
+    }).format(date);
+  } catch {
+    return date.toLocaleDateString();
+  }
+});
+
+
+const addedTitle = computed(() => {
+
+  const date = new Date(
+    props.contact?.created_at || "",
+  );
+
+  if (Number.isNaN(date.getTime())) {
+    return "";
+  }
+
+  return date.toLocaleString();
+});
+
+
 const phoneLink = computed(() => {
 
   const phone =
@@ -347,10 +467,13 @@ const deleteContact = async () => {
   }
 
 
-  const confirmed =
-    window.confirm(
-      `Are you sure you want to delete "${props.contact.name}"?`
-    );
+  const confirmed = await confirmAction({
+    title: `Delete "${props.contact.name}"?`,
+    message:
+      "This contact will be permanently removed from your phonebook.",
+    confirmText: "Delete",
+    danger: true,
+  });
 
 
   if (!confirmed) {
@@ -365,6 +488,13 @@ const deleteContact = async () => {
 
     await api.delete(
       `/contacts/${props.contact.id}`
+    );
+
+
+    toast(
+      "success",
+      "Contact deleted",
+      props.contact.name,
     );
 
 
@@ -386,7 +516,11 @@ const deleteContact = async () => {
       "Unable to delete contact. Please try again.";
 
 
-    window.alert(message);
+    toast(
+      "error",
+      "Delete failed",
+      message,
+    );
 
   } finally {
 
@@ -394,3 +528,38 @@ const deleteContact = async () => {
   }
 };
 </script>
+
+
+<style scoped>
+/* favorite star sits ahead of Edit / Delete */
+.star-action {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
+  padding: 0 6px;
+}
+
+.star-action svg {
+  width: 15px;
+  height: 15px;
+}
+
+.star-action {
+  color: var(--text-faint);
+
+  transition:
+    color 0.15s ease,
+    background 0.15s ease;
+}
+
+.star-action:hover {
+  color: var(--warning);
+
+  background: var(--warning-soft);
+}
+
+.star-action.is-favorite {
+  color: var(--warning);
+}
+</style>

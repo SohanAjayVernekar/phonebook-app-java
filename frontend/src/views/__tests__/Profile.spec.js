@@ -109,7 +109,7 @@ const mountProfile = async () => {
 
 
 describe(
-  "Profile & settings",
+  "Profile",
 
   () => {
 
@@ -273,63 +273,6 @@ describe(
       }
     );
 
-
-    it(
-      "stores preference changes on the device",
-
-      async () => {
-        localStorage.setItem(
-          "contacts_view_mode",
-          "grid"
-        );
-
-        localStorage.setItem(
-          "contacts_density",
-          "comfortable"
-        );
-
-
-        const wrapper = await mountProfile();
-
-
-        const buttons =
-          wrapper.findAll(".segmented button");
-
-
-        const table =
-          buttons.find((b) =>
-            b.text().includes("Table")
-          );
-
-        const compact =
-          buttons.find((b) =>
-            b.text().includes("Compact")
-          );
-
-
-        await table.trigger("click");
-        await compact.trigger("click");
-
-
-        expect(
-          localStorage.getItem(
-            "contacts_view_mode"
-          )
-        ).toBe("list");
-
-
-        expect(
-          localStorage.getItem(
-            "contacts_density"
-          )
-        ).toBe("compact");
-
-
-        expect(
-          table.classes()
-        ).toContain("active");
-      }
-    );
 
   }
 );

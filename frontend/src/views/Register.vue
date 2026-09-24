@@ -1,5 +1,84 @@
 <template>
-  <div class="register-page">
+  <div class="register-page auth-split">
+
+    <aside class="auth-brand">
+      <div class="auth-brand-inner">
+        <div class="auth-logo">
+          <span class="auth-logo-mark">
+            <svg
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="1.8"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              aria-hidden="true"
+            >
+              <rect
+                x="6"
+                y="4"
+                width="13"
+                height="17"
+                rx="2.5"
+              />
+              <path d="M3.5 9H6 M3.5 15H6" />
+              <circle
+                cx="12.5"
+                cy="10"
+                r="2.1"
+              />
+              <path d="M9 16.2c.6-1.9 1.9-2.9 3.5-2.9s2.9 1 3.5 2.9" />
+            </svg>
+          </span>
+
+          <span class="auth-logo-text">
+            <strong>Phonebook App</strong>
+            <span>Contact Manager</span>
+          </span>
+        </div>
+
+        <h2 class="auth-headline">
+          Join in seconds,
+          stay organized.
+        </h2>
+
+        <p class="auth-sub">
+          Create your account and bring your
+          entire phonebook into one place.
+        </p>
+
+        <ul class="auth-points">
+          <li>Powerful search and filters</li>
+          <li>Categories and favorites</li>
+          <li>CSV import and export</li>
+        </ul>
+
+        <div
+          class="auth-float-cards"
+          aria-hidden="true"
+        >
+          <div class="auth-mini-card m1">
+            <span class="auth-mini-avatar a1">AK</span>
+            <span class="auth-mini-lines"><i></i><i></i></span>
+            <span class="auth-mini-chip work">Work</span>
+          </div>
+
+          <div class="auth-mini-card m2">
+            <span class="auth-mini-avatar a2">MR</span>
+            <span class="auth-mini-lines"><i></i><i></i></span>
+            <span class="auth-mini-chip family">Family</span>
+          </div>
+
+          <div class="auth-mini-card m3">
+            <span class="auth-mini-avatar a3">EP</span>
+            <span class="auth-mini-lines"><i></i><i></i></span>
+            <span class="auth-mini-chip friend">Friend</span>
+          </div>
+        </div>
+      </div>
+    </aside>
+
+    <div class="auth-form-side">
 
     <div class="register-card">
 
@@ -7,7 +86,19 @@
       <div class="register-header">
 
         <div class="register-icon">
-          👤
+          <svg
+            width="30"
+            height="30"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="1.8"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            aria-hidden="true"
+          >
+            <path :d="ICONS.profile" />
+          </svg>
         </div>
 
         <div class="register-brand">
@@ -195,6 +286,8 @@
 
     </div>
 
+    </div>
+
   </div>
 </template>
 
@@ -203,6 +296,7 @@
 import { ref } from "vue";
 import { useRouter } from "vue-router";
 import { useAuthStore } from "../stores/authStore";
+import { ICONS } from "../icons";
 
 const router = useRouter();
 const authStore = useAuthStore();

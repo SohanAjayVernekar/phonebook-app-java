@@ -13,11 +13,11 @@
         </span>
 
         <h1>
-          Profile &amp; settings
+          Profile
         </h1>
 
         <p>
-          Manage your personal details, preferences
+          Manage your personal details
           and account security.
         </p>
       </div>
@@ -90,7 +90,21 @@
       <section class="settings-card">
 
         <div class="settings-card-title">
-          <span class="settings-icon indigo">✎</span>
+          <span class="settings-icon indigo">
+            <svg
+              width="17"
+              height="17"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="1.8"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              aria-hidden="true"
+            >
+              <path :d="ICONSEdit" />
+            </svg>
+          </span>
 
           <div>
             <h2>Edit profile</h2>
@@ -191,109 +205,27 @@
 
 
       <!-- ===================================================
-           PREFERENCES
-      ==================================================== -->
-
-      <section class="settings-card">
-
-        <div class="settings-card-title">
-          <span class="settings-icon violet">⚙</span>
-
-          <div>
-            <h2>Preferences</h2>
-            <p>How contacts are displayed — saved on this device.</p>
-          </div>
-        </div>
-
-
-        <!-- Contact view -->
-        <div class="setting-row">
-
-          <div class="setting-text">
-            <strong>Contact view</strong>
-            <span>Grid cards or the data table.</span>
-          </div>
-
-
-          <div
-            class="segmented"
-            role="group"
-            aria-label="Contact view"
-          >
-            <button
-              type="button"
-              :class="{ active: viewMode === 'grid' }"
-              :aria-pressed="viewMode === 'grid'"
-              @click="viewMode = 'grid'"
-            >
-              ▦ Grid
-            </button>
-
-            <button
-              type="button"
-              :class="{ active: viewMode === 'list' }"
-              :aria-pressed="viewMode === 'list'"
-              @click="viewMode = 'list'"
-            >
-              ☰ Table
-            </button>
-          </div>
-
-        </div>
-
-
-        <!-- Row density -->
-        <div class="setting-row">
-
-          <div class="setting-text">
-            <strong>Row density</strong>
-            <span>Spacing of table rows and contact cards.</span>
-          </div>
-
-
-          <div
-            class="segmented"
-            role="group"
-            aria-label="Row density"
-          >
-            <button
-              type="button"
-              :class="{ active: density === 'comfortable' }"
-              :aria-pressed="density === 'comfortable'"
-              @click="density = 'comfortable'"
-            >
-              Comfortable
-            </button>
-
-            <button
-              type="button"
-              :class="{ active: density === 'compact' }"
-              :aria-pressed="density === 'compact'"
-              @click="density = 'compact'"
-            >
-              Compact
-            </button>
-          </div>
-
-        </div>
-
-
-        <p class="settings-note">
-          Changes apply the next time you open
-          the contacts list.
-        </p>
-
-      </section>
-
-
-      <!-- ===================================================
            SECURITY
       ==================================================== -->
 
       <section class="settings-card">
 
         <div class="settings-card-title">
-          <span class="settings-icon blue">🔒</span>
+          <span class="settings-icon blue">
+            <svg
+              width="17"
+              height="17"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="1.8"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              aria-hidden="true"
+            >
+              <path :d="ICONSLock" />
+            </svg>
+          </span>
 
           <div>
             <h2>Change password</h2>
@@ -410,7 +342,21 @@
       <section class="settings-card">
 
         <div class="settings-card-title">
-          <span class="settings-icon green">↪</span>
+          <span class="settings-icon green">
+            <svg
+              width="17"
+              height="17"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="1.8"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              aria-hidden="true"
+            >
+              <path :d="ICONS.logout" />
+            </svg>
+          </span>
 
           <div>
             <h2>Session</h2>
@@ -477,6 +423,22 @@ import {
 import {
   useAuthStore,
 } from "../stores/authStore";
+
+import {
+  ICONS,
+} from "../icons";
+
+
+/* =========================================================
+   LOCAL ICON PATHS
+========================================================= */
+
+const ICONSEdit =
+  "M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5L17 3z";
+
+const ICONSLock =
+  "M7 11V7a5 5 0 0 1 10 0v4 " +
+  "M5 11h14v10H5z";
 
 
 /* =========================================================
@@ -644,42 +606,6 @@ watch(
       profileForm.name = value || "";
     }
   }
-);
-
-
-/* =========================================================
-   PREFERENCES (same keys as the contacts list)
-======================================================== */
-
-const readPref = (key, fallback) => {
-  return localStorage.getItem(key) || fallback;
-};
-
-
-const writePref = (key, value) => {
-  localStorage.setItem(key, value);
-};
-
-
-const viewMode = ref(
-  readPref("contacts_view_mode", "grid")
-);
-
-
-const density = ref(
-  readPref("contacts_density", "comfortable")
-);
-
-
-watch(
-  viewMode,
-  (value) => writePref("contacts_view_mode", value)
-);
-
-
-watch(
-  density,
-  (value) => writePref("contacts_density", value)
 );
 
 

@@ -9,7 +9,7 @@ export const useContactStore = defineStore(
       totalContacts: 0,
       totalPages: 1,
       currentPage: 1,
-      pageSize: 8,
+      pageSize: 3,
       search: "",
       loading: false,
       error: "",

@@ -23,6 +23,7 @@ const contact = {
   email: "sohan@example.com",
   address: "Mumbai, India",
   category: "WORK",
+  created_at: "2026-09-20T10:00:00.000Z",
 };
 
 
@@ -94,7 +95,8 @@ describe(
           "Phone Number",
           "Email Address",
           "Category",
-          "Address",
+          "Added",
+          "Favorite",
           "Actions",
         ]);
 
@@ -115,7 +117,7 @@ describe(
           row.findAll("td");
 
 
-        expect(cells).toHaveLength(7);
+        expect(cells).toHaveLength(8);
 
 
         expect(
@@ -140,7 +142,14 @@ describe(
 
         expect(
           cells[5].text()
-        ).toContain("Mumbai, India");
+        ).toContain("2026");
+
+
+        expect(
+          cells[6]
+            .find("button.star-action")
+            .exists()
+        ).toBe(true);
       }
     );
 
@@ -157,6 +166,7 @@ describe(
                 ...contact,
                 email: "",
                 address: "",
+                created_at: "",
               },
             ],
 

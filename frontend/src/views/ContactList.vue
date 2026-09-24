@@ -12,15 +12,15 @@
 
       <div>
         <span class="section-label">
-          OVERVIEW
+          CONTACTS
         </span>
 
         <h1>
-          All your contacts
+          Contacts
         </h1>
 
         <p>
-          Search, organize, and manage your phonebook.
+          Your entire network, organized beautifully.
         </p>
       </div>
 
@@ -48,7 +48,19 @@
       <div class="stat-card">
 
         <div class="stat-icon blue">
-          👥
+          <svg
+            width="18"
+            height="18"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="1.8"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            aria-hidden="true"
+          >
+            <path :d="ICONS.contacts" />
+          </svg>
         </div>
 
         <div>
@@ -70,7 +82,19 @@
       <div class="stat-card">
 
         <div class="stat-icon purple">
-          ▦
+          <svg
+            width="18"
+            height="18"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="1.8"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            aria-hidden="true"
+          >
+            <path :d="ICONS.dashboard" />
+          </svg>
         </div>
 
         <div>
@@ -92,7 +116,19 @@
       <div class="stat-card">
 
         <div class="stat-icon green">
-          ●
+          <svg
+            width="12"
+            height="12"
+            viewBox="0 0 12 12"
+            aria-hidden="true"
+          >
+            <circle
+              cx="6"
+              cy="6"
+              r="4"
+              fill="currentColor"
+            />
+          </svg>
         </div>
 
         <div>
@@ -174,7 +210,19 @@
             aria-label="Grid view"
             @click="viewMode = 'grid'"
           >
-            ▦
+            <svg
+              width="15"
+              height="15"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="1.8"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              aria-hidden="true"
+            >
+              <path :d="ICONS.dashboard" />
+            </svg>
           </button>
 
           <button
@@ -184,57 +232,46 @@
             aria-label="Table view"
             @click="viewMode = 'list'"
           >
-            ☰
+            <svg
+              width="15"
+              height="15"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="1.8"
+              stroke-linecap="round"
+              aria-hidden="true"
+            >
+              <path :d="ICONS.menu" />
+            </svg>
           </button>
 
         </div>
 
 
         <!-- Sort -->
-        <label class="control-field">
+        <div class="control-field">
           <span>Sort</span>
 
-          <select
+          <UiDropdown
             v-model="sortBy"
-            aria-label="Sort contacts"
+            :options="SORT_OPTIONS"
+            label="Sort contacts"
             @change="onListOptionChange"
-          >
-            <option value="newest">
-              Newest first
-            </option>
-
-            <option value="oldest">
-              Oldest first
-            </option>
-
-            <option value="name_asc">
-              Name A – Z
-            </option>
-
-            <option value="name_desc">
-              Name Z – A
-            </option>
-          </select>
-        </label>
+          />
+        </div>
 
 
         <!-- Density -->
-        <label class="control-field">
+        <div class="control-field">
           <span>Density</span>
 
-          <select
+          <UiDropdown
             v-model="density"
-            aria-label="Row density"
-          >
-            <option value="comfortable">
-              Comfortable
-            </option>
-
-            <option value="compact">
-              Compact
-            </option>
-          </select>
-        </label>
+            :options="DENSITY_OPTIONS"
+            label="Row density"
+          />
+        </div>
 
 
         <!-- Filters -->
@@ -249,7 +286,19 @@
           :aria-expanded="filtersOpen"
           @click="filtersOpen = !filtersOpen"
         >
-          <span>⚑</span>
+          <svg
+            width="14"
+            height="14"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="1.8"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            aria-hidden="true"
+          >
+            <path :d="ICONSFlag" />
+          </svg>
 
           <span>Filters</span>
 
@@ -260,6 +309,56 @@
             {{ activeFilterCount }}
           </span>
         </button>
+
+
+        <!-- Import -->
+        <router-link
+          to="/import"
+          class="control-link"
+          title="Import contacts"
+          aria-label="Import contacts"
+        >
+          <svg
+            width="14"
+            height="14"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="1.8"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            aria-hidden="true"
+          >
+            <path :d="ICONS.import" />
+          </svg>
+
+          <span>Import</span>
+        </router-link>
+
+
+        <!-- Export -->
+        <router-link
+          to="/export"
+          class="control-link"
+          title="Export contacts"
+          aria-label="Export contacts"
+        >
+          <svg
+            width="14"
+            height="14"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="1.8"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            aria-hidden="true"
+          >
+            <path :d="ICONS.export" />
+          </svg>
+
+          <span>Export</span>
+        </router-link>
 
       </div>
 
@@ -279,7 +378,19 @@
         >
 
           <span>
-            ▦
+            <svg
+              width="14"
+              height="14"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="1.8"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              aria-hidden="true"
+            >
+              <path :d="ICONS.dashboard" />
+            </svg>
           </span>
 
           <span>
@@ -298,7 +409,19 @@
         >
 
           <span>
-            ●
+            <svg
+              width="9"
+              height="9"
+              viewBox="0 0 12 12"
+              aria-hidden="true"
+            >
+              <circle
+                cx="6"
+                cy="6"
+                r="4"
+                fill="currentColor"
+              />
+            </svg>
           </span>
 
           <span>
@@ -317,7 +440,19 @@
         >
 
           <span>
-            ●
+            <svg
+              width="9"
+              height="9"
+              viewBox="0 0 12 12"
+              aria-hidden="true"
+            >
+              <circle
+                cx="6"
+                cy="6"
+                r="4"
+                fill="currentColor"
+              />
+            </svg>
           </span>
 
           <span>
@@ -336,7 +471,19 @@
         >
 
           <span>
-            ●
+            <svg
+              width="9"
+              height="9"
+              viewBox="0 0 12 12"
+              aria-hidden="true"
+            >
+              <circle
+                cx="6"
+                cy="6"
+                r="4"
+                fill="currentColor"
+              />
+            </svg>
           </span>
 
           <span>
@@ -393,9 +540,20 @@
 
         <div class="search-box">
 
-          <span class="search-icon">
-            ⌕
-          </span>
+          <svg
+            class="search-icon"
+            width="17"
+            height="17"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="1.8"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            aria-hidden="true"
+          >
+            <path :d="ICONSSearch" />
+          </svg>
 
 
           <input
@@ -419,7 +577,18 @@
             aria-label="Clear search"
             @click="clearSearch"
           >
-            ×
+            <svg
+              width="12"
+              height="12"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2.2"
+              stroke-linecap="round"
+              aria-hidden="true"
+            >
+              <path :d="ICONS.close" />
+            </svg>
           </button>
 
 
@@ -447,7 +616,21 @@
               class="recent-item"
               @mousedown.prevent="applyRecent(term)"
             >
-              <span class="recent-icon">↻</span>
+              <span class="recent-icon">
+                <svg
+                  width="12"
+                  height="12"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="1.8"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  aria-hidden="true"
+                >
+                  <path :d="ICONSHistory" />
+                </svg>
+              </span>
 
               <span>{{ term }}</span>
             </button>
@@ -526,23 +709,12 @@
               EMAIL
             </span>
 
-            <select
+            <UiDropdown
               v-model="hasEmail"
-              aria-label="Filter by email"
+              :options="EMAIL_OPTIONS"
+              label="Filter by email"
               @change="onListOptionChange"
-            >
-              <option value="">
-                Any
-              </option>
-
-              <option value="true">
-                Has email
-              </option>
-
-              <option value="false">
-                No email
-              </option>
-            </select>
+            />
 
           </div>
 
@@ -633,7 +805,8 @@
                   <col class="w-phone" />
                   <col class="w-email" />
                   <col class="w-category" />
-                  <col class="w-address" />
+                  <col class="w-added" />
+                  <col class="w-fav" />
                   <col class="w-actions" />
                 </colgroup>
 
@@ -676,7 +849,16 @@
                       class="col-address"
                       scope="col"
                     >
-                      Address
+                      Added
+                    </th>
+
+                    <th
+                      class="col-fav"
+                      scope="col"
+                    >
+                      <span class="sr-only">
+                        Favorite
+                      </span>
                     </th>
 
                     <th
@@ -717,6 +899,10 @@
 
                     <td>
                       <span class="skeleton-shimmer skeleton-line w-70"></span>
+                    </td>
+
+                    <td>
+                      <span class="skeleton-shimmer skeleton-box"></span>
                     </td>
 
                     <td>
@@ -768,7 +954,19 @@
           >
 
             <div class="empty-icon">
-              !
+              <svg
+                width="24"
+                height="24"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="1.8"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                aria-hidden="true"
+              >
+                <path :d="ICONS.alertTriangle" />
+              </svg>
             </div>
 
 
@@ -804,7 +1002,19 @@
           >
 
             <div class="empty-icon">
-              👥
+              <svg
+                width="24"
+                height="24"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="1.8"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                aria-hidden="true"
+              >
+                <path :d="ICONS.contacts" />
+              </svg>
             </div>
 
 
@@ -823,7 +1033,19 @@
               to="/contacts/new"
               class="primary-button"
             >
-              ＋ Add Contact
+              <svg
+                width="14"
+                height="14"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
+                aria-hidden="true"
+              >
+                <path :d="ICONS.plus" />
+              </svg>
+              Add Contact
             </router-link>
 
           </div>
@@ -840,7 +1062,19 @@
           >
 
             <div class="empty-icon">
-              ▦
+              <svg
+                width="24"
+                height="24"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="1.8"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                aria-hidden="true"
+              >
+                <path :d="ICONS.dashboard" />
+              </svg>
             </div>
 
 
@@ -859,7 +1093,19 @@
               to="/contacts/new"
               class="primary-button"
             >
-              ＋ Add Contact
+              <svg
+                width="14"
+                height="14"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
+                aria-hidden="true"
+              >
+                <path :d="ICONS.plus" />
+              </svg>
+              Add Contact
             </router-link>
 
           </div>
@@ -875,7 +1121,19 @@
           >
 
             <div class="empty-icon">
-              🔍
+              <svg
+                width="24"
+                height="24"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="1.8"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                aria-hidden="true"
+              >
+                <path :d="ICONSSearch" />
+              </svg>
             </div>
 
 
@@ -959,7 +1217,8 @@
                   <col class="w-phone" />
                   <col class="w-email" />
                   <col class="w-category" />
-                  <col class="w-address" />
+                  <col class="w-added" />
+                  <col class="w-fav" />
                   <col class="w-actions" />
                 </colgroup>
 
@@ -1015,7 +1274,16 @@
                       class="col-address"
                       scope="col"
                     >
-                      Address
+                      Added
+                    </th>
+
+                    <th
+                      class="col-fav"
+                      scope="col"
+                    >
+                      <span class="sr-only">
+                        Favorite
+                      </span>
                     </th>
 
                     <th
@@ -1107,7 +1375,20 @@
                 goToPage(currentPage - 1)
               "
             >
-              ← Previous
+              <svg
+                width="13"
+                height="13"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="1.8"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                aria-hidden="true"
+              >
+                <path :d="ICONS.chevronLeft" />
+              </svg>
+              Previous
             </button>
 
 
@@ -1119,21 +1400,12 @@
               </span>
 
 
-              <select
-                v-model.number="currentPage"
-                aria-label="Select page"
+              <UiDropdown
+                v-model="currentPage"
+                :options="pageOptions"
+                label="Select page"
                 @change="onPageSelect"
-              >
-
-                <option
-                  v-for="page in totalPages"
-                  :key="page"
-                  :value="page"
-                >
-                  {{ page }}
-                </option>
-
-              </select>
+              />
 
 
               <span>
@@ -1176,7 +1448,20 @@
                 goToPage(currentPage + 1)
               "
             >
-              Next →
+              Next
+              <svg
+                width="13"
+                height="13"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="1.8"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                aria-hidden="true"
+              >
+                <path :d="ICONS.chevronRight" />
+              </svg>
             </button>
 
           </div>
@@ -1231,6 +1516,7 @@
 <script setup>
 import {
   computed,
+  getCurrentInstance,
   nextTick,
   onBeforeUnmount,
   onMounted,
@@ -1243,9 +1529,38 @@ import { useRouter } from "vue-router";
 
 import api from "../services/api";
 
+import {
+  confirmAction,
+  toast,
+} from "../services/ui";
+
 import ContactCard from "../components/ContactCard.vue";
 
 import ContactTableRow from "../components/ContactTableRow.vue";
+
+import UiDropdown from "../components/UiDropdown.vue";
+
+import {
+  ICONS,
+} from "../icons";
+
+
+/* =========================================================
+   LOCAL ICON PATHS
+========================================================= */
+
+const ICONSSearch =
+  "M11 19a8 8 0 1 0 0-16 8 8 0 0 0 0 16z " +
+  "M21 21l-4.35-4.35";
+
+const ICONSFlag =
+  "M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z " +
+  "M4 22v-7";
+
+const ICONSHistory =
+  "M3 3v5h5 " +
+  "M3.05 13A9 9 0 1 0 6 5.3L3 8 " +
+  "M12 7v5l4 2";
 
 
 const router = useRouter();
@@ -1294,6 +1609,35 @@ const CATEGORY_LABELS = {
   FAMILY: "Family",
   FRIEND: "Friend",
 };
+
+/* Options for the floating dropdowns (same values as before). */
+const SORT_OPTIONS = [
+  { value: "newest", label: "Newest first" },
+  { value: "oldest", label: "Oldest first" },
+  { value: "name_asc", label: "Name A – Z" },
+  { value: "name_desc", label: "Name Z – A" },
+];
+
+const DENSITY_OPTIONS = [
+  { value: "comfortable", label: "Comfortable" },
+  { value: "compact", label: "Compact" },
+];
+
+const EMAIL_OPTIONS = [
+  { value: "", label: "Any" },
+  { value: "true", label: "Has email" },
+  { value: "false", label: "No email" },
+];
+
+const pageOptions = computed(() => {
+  const pages = [];
+
+  for (let page = 1; page <= totalPages.value; page += 1) {
+    pages.push({ value: page, label: String(page) });
+  }
+
+  return pages;
+});
 
 const readPref = (key, fallback) => {
   try {
@@ -1836,11 +2180,15 @@ const deleteSelected = async () => {
     return;
   }
 
-  const confirmed = window.confirm(
-    `Delete ${count} selected ${
+  const confirmed = await confirmAction({
+    title: `Delete ${count} selected ${
       count === 1 ? "contact" : "contacts"
-    }?`
-  );
+    }?`,
+    message:
+      "The selected contacts will be permanently removed from your phonebook.",
+    confirmText: "Delete",
+    danger: true,
+  });
 
   if (!confirmed) {
     return;
@@ -1858,13 +2206,21 @@ const deleteSelected = async () => {
 
     await loadContacts();
 
-    window.alert(
-      `${response.data.deleted ?? count} contacts deleted.`
+    toast(
+      "success",
+      "Contacts deleted",
+      `${response.data.deleted ?? count} ${
+        (response.data.deleted ?? count) === 1
+          ? "contact was"
+          : "contacts were"
+      } removed.`
     );
   } catch (err) {
     console.error("Bulk delete error:", err);
 
-    window.alert(
+    toast(
+      "error",
+      "Bulk delete failed",
       err?.response?.data?.detail ||
         "Unable to delete the selected contacts."
     );
@@ -2308,10 +2664,74 @@ defineExpose({
 
 
 /* =========================================================
+   DEEP LINK  /contacts?categories=WORK,FAMILY
+   Read through the component proxy — ContactList is also
+   mounted bare (no router) in tests, where useRoute()
+   would throw.
+========================================================= */
+
+const applyRouteQuery = () => {
+
+  const routeQuery =
+    getCurrentInstance()?.proxy?.$route?.query;
+
+  /* Deep-linked global search (?q=) from the topbar. */
+  const search =
+    routeQuery?.q;
+
+  if (typeof search === "string" && search.trim()) {
+    searchInput.value = search.trim();
+
+    activeSearch.value = search.trim();
+  }
+
+  const query = routeQuery?.categories;
+
+  if (!query) {
+    return;
+  }
+
+
+  const valid = ["WORK", "FAMILY", "FRIEND"];
+
+  const picked = String(query)
+    .split(",")
+    .map((value) => value.trim().toUpperCase())
+    .filter((value) => valid.includes(value));
+
+
+  if (picked.length > 0) {
+    selectedCategories.value = picked;
+
+    filtersOpen.value = picked.length > 1;
+
+    currentPage.value = 1;
+  }
+};
+
+
+/* Follow-up topbar searches (?q=) while staying on the page. */
+watch(
+  () => getCurrentInstance()?.proxy?.$route?.query?.q,
+  (next) => {
+    if (
+      typeof next === "string" &&
+      next.trim() &&
+      next.trim() !== searchInput.value
+    ) {
+      searchInput.value = next.trim();
+    }
+  },
+);
+
+
+/* =========================================================
    INITIAL LOAD
 ========================================================= */
 
 onMounted(() => {
+
+  applyRouteQuery();
 
   measureColumns();
 

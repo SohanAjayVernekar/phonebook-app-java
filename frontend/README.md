@@ -1,4 +1,4 @@
-# 📞 Connect — Phonebook Application
+# 📞 Phonebook App
 
 A full-stack contact management application built with **FastAPI, PostgreSQL, Vue 3, and Docker**.
 

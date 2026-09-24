@@ -25,7 +25,21 @@
         class="back-button"
         @click="goBack"
       >
-        <span class="back-arrow">←</span>
+        <span class="back-arrow">
+          <svg
+            width="15"
+            height="15"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="1.8"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            aria-hidden="true"
+          >
+            <path :d="ICONS.chevronLeft" />
+          </svg>
+        </span>
         <span>Back</span>
       </button>
     </div>
@@ -44,7 +58,19 @@
       <div class="form-title">
 
         <div class="edit-icon">
-          ＋
+          <svg
+            width="17"
+            height="17"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="1.8"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            aria-hidden="true"
+          >
+            <path :d="ICONS.plus" />
+          </svg>
         </div>
 
         <div>
@@ -72,6 +98,11 @@
       </div>
 
 
+      <p class="form-section">
+        PERSONAL
+      </p>
+
+
       <!-- ===================================================
            NAME
       ==================================================== -->
@@ -94,6 +125,11 @@
         />
 
       </div>
+
+
+      <p class="form-section">
+        CONTACT
+      </p>
 
 
       <!-- ===================================================
@@ -160,6 +196,11 @@
       </div>
 
 
+      <p class="form-section">
+        ORGANIZATION
+      </p>
+
+
       <!-- ===================================================
            CATEGORY
       ==================================================== -->
@@ -171,23 +212,12 @@
           <span>*</span>
         </label>
 
-        <select
-          id="category"
+        <UiDropdown
+          input-id="category"
           v-model="form.category"
-          required
-        >
-          <option value="WORK">
-            Work
-          </option>
-
-          <option value="FAMILY">
-            Family
-          </option>
-
-          <option value="FRIEND">
-            Friend
-          </option>
-        </select>
+          :options="CATEGORY_OPTIONS"
+          label="Category"
+        />
 
       </div>
 
@@ -210,11 +240,32 @@
         <button
           type="submit"
           class="save-button"
-          :disabled="saving"
+          :class="{ 'is-saved': saved }"
+          :disabled="saving || saved"
         >
 
           <span v-if="saving">
             Saving...
+          </span>
+
+          <span
+            v-else-if="saved"
+            class="save-saved"
+          >
+            <svg
+              width="14"
+              height="14"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2.4"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              aria-hidden="true"
+            >
+              <path d="M20 6 9 17l-5-5" />
+            </svg>
+            Saved
           </span>
 
           <span v-else>
@@ -243,6 +294,20 @@ import {
 
 import api from "../services/api";
 
+import UiDropdown from "../components/UiDropdown.vue";
+
+import {
+  ICONS,
+} from "../icons";
+
+
+/* Category options for the floating dropdown. */
+const CATEGORY_OPTIONS = [
+  { value: "WORK", label: "Work" },
+  { value: "FAMILY", label: "Family" },
+  { value: "FRIEND", label: "Friend" },
+];
+
 
 /* =========================================================
    Router
@@ -269,6 +334,8 @@ const form = reactive({
 ========================================================= */
 
 const saving = ref(false);
+
+const saved = ref(false);
 
 const error = ref("");
 
@@ -395,6 +462,8 @@ const createContact = async () => {
 
   error.value = "";
 
+  saved.value = false;
+
 
   if (!validateForm()) {
     return;
@@ -431,16 +500,18 @@ const createContact = async () => {
 
 
     /*
-     * IMPORTANT:
-     *
-     * "/" is now the cover page.
-     *
-     * After successful creation,
-     * go directly to the dashboard.
+     * Show the success state briefly,
+     * then go to the dashboard.
      */
-    await router.push(
-      "/contacts"
-    );
+    saved.value = true;
+
+    setTimeout(() => {
+
+      router.push(
+        "/contacts"
+      );
+
+    }, 650);
 
   } catch (err) {
 

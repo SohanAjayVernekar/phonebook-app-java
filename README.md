@@ -1,36 +1,25 @@
 # 📱 Phonebook Application
 
-A full-stack Phonebook Application for managing contacts with a modern Vue.js frontend, FastAPI backend, and PostgreSQL database.
+A full-stack Phonebook application for managing contacts: a modern **Vue 3** frontend, an **ASP.NET Core 8 (.NET)** REST API, and **PostgreSQL** — containerized with Docker Compose.
 
-The application supports creating, viewing, updating, deleting, searching, and filtering contacts. It is containerized using Docker Compose and includes automated frontend and backend testing through GitHub Actions.
+The application supports user registration/login (JWT), creating, viewing, updating, deleting, searching, and filtering contacts. The frontend is served together with the API behind a single Nginx reverse proxy.
 
 ---
 
 ## 🚀 Features
 
-* Create new contacts
-* View contact details
-* Update existing contacts
-* Delete contacts
-* Search contacts by:
-
-  * Name
-  * Phone number
-* Filter contacts by category:
-
-  * WORK
-  * FAMILY
-  * FRIEND
+* User registration, login, logout (JWT Bearer)
+* Profile management (name, password change)
+* Create / view / update / delete contacts
+* Search contacts by name or phone number
+* Filter by category (`WORK`, `FAMILY`, `FRIEND`), by e-mail presence, by date range
+* Sorting (`newest`, `oldest`, `name_asc`, `name_desc`)
 * Pagination for contact lists
-* Phone number validation
-* Email validation
-* RESTful API using FastAPI
-* PostgreSQL database
-* Responsive Vue.js frontend
-* Dockerized frontend, backend, and database
-* Backend testing with Pytest
-* Frontend testing with Vitest
-* GitHub Actions CI workflow
+* Bulk delete (up to 100 at a time)
+* Client-side contact import / export
+* Phone number, e-mail, and category validation
+* Light + dark themes, responsive Vue 3 frontend
+* Frontend testing with Vitest, CI with GitHub Actions
 
 ---
 
@@ -38,75 +27,83 @@ The application supports creating, viewing, updating, deleting, searching, and f
 
 ### Frontend
 
-* Vue 3
-* Vite
-* Vue Router
-* Pinia
-* Axios
-* Vitest
-* Vue Test Utils
+* Vue 3 + Vite
+* Vue Router, Pinia, Axios
+* Vitest + Vue Test Utils
+* Nginx (production server + API reverse proxy)
 
 ### Backend
 
-* Python
-* FastAPI
-* SQLAlchemy
-* Pydantic
-* PostgreSQL
-* Pytest
-* Uvicorn
+* C# / ASP.NET Core 8 Web API
+* Entity Framework Core + Npgsql (PostgreSQL)
+* JWT Bearer authentication (HS512/HS384/HS256 by key length)
+* Argon2id password hashing
+* Swagger / OpenAPI (Swashbuckle)
 
 ### DevOps
 
-* Docker
-* Docker Compose
+* Docker + Docker Compose
 * GitHub Actions
+* PostgreSQL 16
 
 ---
 
 ## 📂 Project Structure
 
 ```text
-phonebook-application/
+phonebook-app/
 │
 ├── .github/
 │   └── workflows/
 │       └── ci.yml
 │
-├── backend/
-│   ├── app/
-│   │   ├── __init__.py
-│   │   ├── crud.py
-│   │   ├── database.py
-│   │   ├── main.py
-│   │   ├── models.py
-│   │   └── schemas.py
-│   │
-│   ├── tests/
-│   │   ├── test_contacts.py
-│   │   └── test_health.py
-│   │
+├── backend-dotnet/
+│   ├── Configuration/        # (reserved) JWT/settings helpers
+│   ├── Controllers/
+│   │   ├── AuthController.cs
+│   │   ├── ContactsController.cs
+│   │   └── HealthController.cs
+│   ├── Data/
+│   │   ├── AppDbContext.cs   # EF Core mapping (existing tables)
+│   │   ├── DbInitializer.cs  # schema guard + demo-account seeder
+│   │   └── FakeDataGenerator.cs
+│   ├── DTOs/
+│   │   └── DTOs.cs
+│   ├── Middleware/
+│   │   └── ExceptionMiddleware.cs
+│   ├── Models/
+│   │   ├── User.cs
+│   │   └── Contact.cs
+│   ├── Repositories/
+│   │   └── Repositories.cs
+│   ├── Services/
+│   │   ├── ApiException.cs
+│   │   ├── JwtService.cs
+│   │   └── PasswordService.cs
+│   ├── Program.cs
+│   ├── appsettings.json
+│   ├── appsettings.Development.json
+│   ├── PhoneBookApi.csproj
 │   ├── Dockerfile
-│   └── requirements.txt
+│   └── .dockerignore
 │
 ├── frontend/
 │   ├── public/
 │   ├── src/
 │   │   ├── components/
+│   │   ├── composables/
 │   │   ├── router/
-│   │   ├── services/
+│   │   ├── services/         # axios client (baseURL: /api)
 │   │   ├── stores/
+│   │   ├── styles/
 │   │   └── views/
-│   │
 │   ├── Dockerfile
-│   ├── nginx.conf
+│   ├── nginx.conf            # SPA + /api/* reverse proxy on :80
 │   ├── package.json
-│   ├── package-lock.json
 │   ├── vite.config.js
 │   └── vitest.config.js
 │
 ├── docker-compose.yml
-├── .gitignore
 └── README.md
 ```
 
@@ -115,474 +112,251 @@ phonebook-application/
 ## 🔄 Application Architecture
 
 ```text
-                    ┌─────────────────────┐
-                    │      Vue 3          │
-                    │     Frontend        │
-                    │                     │
-                    │ Vue Router          │
-                    │ Pinia               │
-                    │ Axios               │
-                    └──────────┬──────────┘
+                    ┌──────────────────────┐
+                    │      FRONTEND        │
+                    │   Vue 3 + Vite       │
+                    │   Nginx on :80       │
+                    │   /  → SPA           │
+                    │   /api/* → backend   │
+                    └──────────┬───────────┘
                                │
-                            HTTP/REST
-                               │
+                               │ HTTP/REST (same port :80)
                                ▼
-                    ┌─────────────────────┐
-                    │      FastAPI        │
-                    │       Backend       │
-                    │                     │
-                    │ API Routes          │
-                    │ Pydantic Schemas    │
-                    │ CRUD Operations     │
-                    └──────────┬──────────┘
+                    ┌──────────────────────┐
+                    │    ASP.NET CORE 8    │
+                    │    .NET backend      │
+                    │    internal :8000    │
+                    │    container:        │
+                    │ phonebook-dotnet-    │
+                    │ backend              │
+                    └──────────┬───────────┘
                                │
-                          SQLAlchemy
-                               │
+                               │ EF Core + Npgsql
                                ▼
-                    ┌─────────────────────┐
-                    │     PostgreSQL      │
-                    │      Database       │
-                    └─────────────────────┘
+                    ┌──────────────────────┐
+                    │     POSTGRESQL 16    │
+                    │ container:           │
+                    │ phonebook-postgres   │
+                    │ db: phonebook        │
+                    └──────────────────────┘
 ```
 
-Docker Compose manages the PostgreSQL, backend, and frontend services.
+Docker Compose manages the PostgreSQL, backend, and frontend services. The backend is **not** published to the host — everything goes through port `:80`.
 
 ---
 
 ## 🔌 REST API
 
-### Health Check
+All API routes live under `/api` (same origin in production and in `npm run dev`). Protected routes require:
 
 ```http
-GET /health
+Authorization: Bearer <access_token>
 ```
 
-Checks whether the API and database are available.
-
-Example response:
+Error responses always look like:
 
 ```json
-{
-  "api": "online",
-  "database": "online"
-}
+{ "detail": "…", "message": "…" }
 ```
 
----
+| Existing Endpoint | Method | Auth | Description |
+|---|---|---|---|
+| `/api/health` | GET | no | `{"api":"online","database":"online"}` |
+| `/api/auth/register` | POST | no | Register → 201 `{access_token, token_type, user}` |
+| `/api/auth/login` | POST | no | Login → 200 `{access_token, token_type, user}` |
+| `/api/auth/me` | GET | yes | Current user |
+| `/api/auth/me` | PATCH | yes | Update name → 200 user |
+| `/api/auth/me/password` | PATCH | yes | Change password → 204 |
+| `/api/contacts` | GET | yes | List (search / filter / sort / paginate) |
+| `/api/contacts` | POST | yes | Create → 201 contact |
+| `/api/contacts/{id}` | GET | yes | Single contact (404 if missing/foreign) |
+| `/api/contacts/{id}` | PUT | yes | Update → 200 contact |
+| `/api/contacts/{id}` | DELETE | yes | Delete → 200 `{message, id}` |
+| `/api/contacts/bulk-delete` | POST | yes | `{ids:[…]}` → 200 `{deleted:n}` (max 100) |
 
-### Get Contacts
+### List query parameters
 
-```http
-GET /contacts
-```
+| Parameter | Description | Example |
+|---|---|---|
+| `search` | Matches name or phone (case-insensitive) | `?search=liam` |
+| `category` | Single category (case-insensitive) | `?category=WORK` |
+| `categories` | Comma-separated list | `?categories=WORK,FRIEND` |
+| `sort` | `newest` (default), `oldest`, `name_asc`, `name_desc` | `?sort=name_asc` |
+| `has_email` | `true` / `false` | `?has_email=true` |
+| `date_from` / `date_to` | `yyyy-MM-dd` (from inclusive, to whole day) | `?date_from=2025-01-01` |
+| `page` | 1-based page (default `1`) | `?page=2` |
+| `page_size` | 1–100 (default `8`) | `?page_size=20` |
 
-Supports searching, category filtering, and pagination.
-
-#### Query Parameters
-
-| Parameter   | Description                    | Example |
-| ----------- | ------------------------------ | ------- |
-| `search`    | Search by name or phone number | `john`  |
-| `category`  | Filter by category             | `WORK`  |
-| `page`      | Page number                    | `1`     |
-| `page_size` | Number of contacts per page    | `10`    |
-
-Example:
-
-```http
-GET /contacts?search=john&category=WORK&page=1&page_size=10
-```
-
-Example response:
+List responses look like:
 
 ```json
 {
   "items": [],
   "total": 0,
   "page": 1,
-  "page_size": 10,
+  "page_size": 8,
   "total_pages": 1,
-  "category": "WORK"
+  "category": null,
+  "sort": "newest"
 }
 ```
 
----
+### Validation (status 400 unless noted)
 
-### Create Contact
-
-```http
-POST /contacts
-```
-
-Example request:
-
-```json
-{
-  "name": "John Doe",
-  "phone_number": "+919876543210",
-  "email": "john@example.com",
-  "address": "Mumbai, India",
-  "category": "WORK"
-}
-```
-
-Returns the newly created contact.
-
----
-
-### Get Contact
-
-```http
-GET /contacts/{contact_id}
-```
-
-Example:
-
-```http
-GET /contacts/1
-```
-
-Returns a single contact.
-
----
-
-### Update Contact
-
-```http
-PUT /contacts/{contact_id}
-```
-
-Example:
-
-```http
-PUT /contacts/1
-```
-
-Updates the specified contact.
-
----
-
-### Delete Contact
-
-```http
-DELETE /contacts/{contact_id}
-```
-
-Example:
-
-```http
-DELETE /contacts/1
-```
-
-Deletes the specified contact.
+* Name required, 2–255 chars (contacts: name ≤ 255)
+* E-mail must be well-formed when present (optional on contacts)
+* Password 8–128 chars; register e-mail must be unique (409)
+* Phone required, 7–20 chars, `^\+?[1-9]\d{6,19}$`; globally unique (409 on conflict)
+* Category must be `WORK`, `FAMILY`, or `FRIEND` (defaults to `FRIEND`)
+* Duplicate contact e-mail → 409
 
 ---
 
 ## 🗄️ Database Model
 
-The application uses a PostgreSQL `contacts` table.
+PostgreSQL database `phonebook`. The backend maps the existing tables 1:1 and never alters them (no migrations run at startup).
 
-| Field          | Type     | Description                |
-| -------------- | -------- | -------------------------- |
-| `id`           | Integer  | Primary key                |
-| `name`         | String   | Contact name               |
-| `phone_number` | String   | Unique phone number        |
-| `email`        | String   | Optional unique email      |
-| `address`      | Text     | Optional address           |
-| `category`     | String   | WORK, FAMILY, or FRIEND    |
-| `created_at`   | DateTime | Contact creation timestamp |
+| PostgreSQL Table | C# Model | Primary Key | Relationships |
+|---|---|---|---|
+| `users` | `User` | `id` (identity) | one-to-many → contacts |
+| `contacts` | `Contact` | `id` (identity) | many-to-one → users via `user_id` (nullable) |
 
----
+`users`: `id`, `name`, `email` (unique), `password_hash` (nullable, Argon2id), `google_id` (nullable, unique), `created_at` (timestamptz).
 
-## 🧪 Validation
+`contacts`: `id`, `user_id` (nullable FK → `users.id`), `name`, `phone_number` (unique), `email` (nullable, unique), `address` (text, nullable), `category`, `created_at` (timestamptz).
 
-The backend uses Pydantic for request validation.
-
-### Phone Number
-
-Phone numbers must contain 7–20 digits and may optionally start with `+`.
-
-Example:
-
-```text
-+919876543210
-```
-
-### Email
-
-Email addresses are validated using Pydantic's `EmailStr`.
-
-### Category
-
-Only the following categories are accepted:
-
-```text
-WORK
-FAMILY
-FRIEND
-```
+> ⚠️ Never run destructive commands against the database (`DROP`, `TRUNCATE`, `DELETE FROM`, `docker compose down -v`). The volume `postgres_data` holds all data.
 
 ---
 
 ## 🐳 Running with Docker
 
-Make sure Docker Desktop is installed and running.
-
 From the project root:
 
 ```bash
-docker compose up --build
+docker compose up -d --build
+docker compose ps
+docker logs -f phonebook-dotnet-backend
 ```
 
-This starts:
+| Container | Port | Purpose |
+|---|---|---|
+| `phonebook-postgres` | `5432` | PostgreSQL 16 (`phonebook` db) |
+| `phonebook-dotnet-backend` | internal `8000` | ASP.NET Core API (via `:80` only) |
+| `phonebook-frontend` | `80` | Vue SPA + `/api/*` reverse proxy |
 
-```text
-PostgreSQL
-    ↓
-FastAPI Backend
-    ↓
-Vue Frontend
+Application: `http://localhost:80` (login with `testuser@example.com` / `Test@12345`).
+
+### Other commands
+
+```bash
+docker compose build          # rebuild images
+docker compose up -d          # start
+docker compose ps             # status
+docker compose stop           # stop (keeps data)
+docker compose restart        # restart
+docker network ls             # networks (app uses <project>_default)
+docker logs phonebook-dotnet-backend
+docker logs phonebook-frontend
+docker logs phonebook-postgres
 ```
 
-### Services
+### Swagger
 
-| Service    |   Port | Purpose     |
-| ---------- | -----: | ----------- |
-| PostgreSQL | `5432` | Database    |
-| FastAPI    | `8000` | Backend API |
-| Vue/Nginx  | `5173` | Frontend    |
+The API serves Swagger internally. To browse it, forward the backend port temporarily:
 
-### Application
-
-Frontend:
-
-```text
-http://localhost:5173
-```
-
-Backend:
-
-```text
-http://localhost:8000
-```
-
-FastAPI Swagger documentation:
-
-```text
-http://localhost:8000/docs
+```bash
+docker run --rm --network phonebook-app-java-main_default \
+  -p 127.0.0.1:18080:8000 phonebook-app-java-main-backend
+# then open http://localhost:18080/swagger (JWT via Authorize button)
 ```
 
 ---
 
-## 💻 Running Backend Locally
+## 💻 Running the Backend Locally
 
-Navigate to the backend:
-
-```bash
-cd backend
-```
-
-Create and activate a virtual environment:
-
-### Windows
-
-```powershell
-python -m venv .venv
-.venv\Scripts\activate
-```
-
-Install dependencies:
+Requires the [.NET 8 SDK](https://dotnet.microsoft.com/download/dotnet/8.0):
 
 ```bash
-pip install -r requirements.txt
+cd backend-dotnet
+dotnet restore
+dotnet build
+dotnet run   # listens on http://localhost:8000 (ASPNETCORE_URLS)
 ```
 
-Set the database connection if PostgreSQL is running locally:
-
-```powershell
-$env:DATABASE_URL="postgresql://postgres:postgres@localhost:5432/phonebook"
-```
-
-Start the FastAPI application:
+Point it at a database with:
 
 ```bash
-uvicorn app.main:app --reload
+ConnectionStrings__DefaultConnection="Host=localhost;Port=5432;Database=phonebook;Username=postgres;Password=postgres"
 ```
 
-The API will be available at:
+(`appsettings.Development.json` already defaults to this.)
 
-```text
-http://localhost:8000
-```
-
-Swagger documentation:
-
-```text
-http://localhost:8000/docs
-```
-
----
-
-## 🎨 Running Frontend Locally
-
-Navigate to the frontend:
+## 🎨 Running the Frontend Locally
 
 ```bash
 cd frontend
-```
-
-Install dependencies:
-
-```bash
 npm install
+npm run dev    # http://localhost:5173 — /api proxied to http://localhost:80
 ```
 
-Start the development server:
-
-```bash
-npm run dev
-```
-
-The frontend will normally be available at:
-
-```text
-http://localhost:5173
-```
+The Docker stack must be up so the dev proxy has an API to call.
 
 ---
 
 ## 🧪 Testing
 
-### Backend Tests
+### Backend (API compatibility battery)
 
-From the `backend` directory:
-
-```bash
-pytest -q
-```
-
-Backend tests cover API health and contact functionality.
-
-### Frontend Tests
-
-From the `frontend` directory:
+Exercise every endpoint against a running stack:
 
 ```bash
-npm test
-```
-
-### Frontend Build
-
-To create a production build:
-
-```bash
-npm run build
-```
-
----
-
-## 🔄 Continuous Integration
-
-The project includes a GitHub Actions workflow:
-
-```text
-.github/workflows/ci.yml
-```
-
-The CI pipeline performs:
-
-### Backend
-
-```text
-Checkout code
-      ↓
-Set up Python
-      ↓
-Install dependencies
-      ↓
-Run Pytest
+BASE=http://localhost:80 ./scripts/api-battery.sh   # 42 checks
 ```
 
 ### Frontend
 
-```text
-Checkout code
-      ↓
-Set up Node.js
-      ↓
-npm ci
-      ↓
-Run Vitest
-      ↓
-Build frontend
+```bash
+cd frontend
+npm test        # Vitest suite
+npm run build   # production build
 ```
 
-This helps ensure that changes do not break the backend tests, frontend tests, or production frontend build.
+### CI
+
+`.github/workflows/ci.yml` builds the .NET backend and runs the frontend tests + build.
 
 ---
 
 ## 🔐 Environment Variables
 
-The backend supports the following environment variable:
+| Variable | Purpose | Default |
+|---|---|---|
+| `ConnectionStrings__DefaultConnection` | Npgsql connection string | `Host=postgres;Port=5432;Database=phonebook;Username=postgres;Password=postgres` |
+| `Jwt__Key` | HMAC signing secret (≥32 chars; HS512 ≥64 B, HS384 ≥48 B) | built-in dev default (override in production!) |
+| `Jwt__ExpiryMinutes` | Token lifetime | `60` |
+| `JWT_SECRET` | Alias for `Jwt__Key` (previous backend's name) | — |
+| `JWT_EXPIRATION_MINUTES` | Alias for `Jwt__ExpiryMinutes` | — |
+| `ASPNETCORE_URLS` | Listen address in the image | `http://+:8000` |
 
-```text
-DATABASE_URL
-```
-
-Example:
-
-```text
-DATABASE_URL=postgresql://postgres:postgres@localhost:5432/phonebook
-```
-
-For Docker Compose, the backend connects to PostgreSQL using the Docker service name:
-
-```text
-postgresql://postgres:postgres@postgres:5432/phonebook
-```
-
-Do not commit real credentials or `.env` files to GitHub.
+Do not commit real secrets or `.env` files.
 
 ---
 
-## 🛡️ Git Ignore
+## 🔁 Backend Notes (Java → .NET)
 
-The project ignores files and directories that should not be committed, including:
-
-```text
-.venv/
-venv/
-node_modules/
-frontend/dist/
-__pycache__/
-.pytest_cache/
-.env
-.env.*
-.vscode/
-.idea/
-```
+* Same routes, query params, JSON names, and status codes; old JWTs still validate (same secret + key-length-based algorithm).
+* Passwords use the same Argon2id parameters, so existing hashes verify unchanged.
+* Error bodies now always include the reason in `detail`/`message` (previously empty); duplicate phone/e-mail returns `409` instead of `500`.
+* Date boundaries are evaluated in UTC (containers run on UTC).
+* Startup ensures the schema objects and the documented demo account exist (idempotent; data-preserving) and tops the demo account up to 1000 contacts.
 
 ---
 
 ## 📌 Future Improvements
 
-Possible improvements for future versions include:
-
-* Authentication and authorization
-* Database migrations using Alembic
-* More comprehensive API test coverage
-* PostgreSQL service integration in CI
-* Improved error handling
-* Contact sorting options
-* Import/export contacts
-* Profile/contact photos
-* Deployment to a cloud platform
-* Production environment configuration
-
----
-
-## 👨‍💻 Project
-
-**Phonebook Application**
-
-A full-stack CRUD application demonstrating modern frontend development, REST API design, database integration, testing, containerization, and continuous integration.
+* Refresh tokens / interpretable session list
+* Rate limiting on auth endpoints
+* Production secret management (vault / managed identity)
+* Postgres backups + PITR runbook
+* Expanded backend integration tests in CI
